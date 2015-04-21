@@ -3,6 +3,12 @@ Experimental Python interfaces for LSST
 
 This repository is used as a test bed for experimenting with the Python API used in the data management stack. To use the software a copy of the DM stack should be installed and AFW should be setup.
 
+```
+% python setup.py build
+% python setup.py test
+% python setup.py flake8
+```
+
 License
 ---
 
