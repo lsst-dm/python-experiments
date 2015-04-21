@@ -80,7 +80,7 @@ class Exposure (object):
         # Need to extract dtype from keyword args and then forward on to low-level
         # constructor
         dtype = self._determine_dtype(kwargs)
-        self._Exposure = self._create_ExposureX(dtype, *args, **kwargs)
+        self._swig_object = self._create_ExposureX(dtype, *args, **kwargs)
 
     @classmethod
     def _create_ExposureX(cls, dtype, *args, **kwargs):
@@ -112,116 +112,116 @@ class Exposure (object):
     def bbox(self):
         # Note that getBBox() has a form that takes an ImageOrigin argument
         # but that can not be a property. See get_bbox_with_origin()
-        bb = self._Exposure.getBBox()
+        bb = self._swig_object.getBBox()
         return geom.Box2I(_external=bb)
 
     @property
     def calib(self):
-        return self._Exposure.getCalib()
+        return self._swig_object.getCalib()
 
     @property
     def detector(self):
-        return self._Exposure.getDetector()
+        return self._swig_object.getDetector()
 
     @property
     def filter(self):
-        return self._Exposure.getFilter()
+        return self._swig_object.getFilter()
 
     @property
     def height(self):
-        return self._Exposure.getHeight()
+        return self._swig_object.getHeight()
 
     @property
     def info(self):
-        return self._Exposure.getInfo()
+        return self._swig_object.getInfo()
 
     @property
     def masked_image(self):
-        return self._Exposure.getMaskedImage()
+        return self._swig_object.getMaskedImage()
 
     @property
     def metadata(self):
-        return self._Exposure.getMetadata()
+        return self._swig_object.getMetadata()
 
     @property
     def psf(self):
-        return self._Exposure.getPsf()
+        return self._swig_object.getPsf()
 
     @property
     def wcs(self):
-        return self._Exposure.getWcs()
+        return self._swig_object.getWcs()
 
     @property
     def width(self):
-        return self._Exposure.getWidth()
+        return self._swig_object.getWidth()
 
     @property
     def x0(self):
-        return self._Exposure.getX0()
+        return self._swig_object.getX0()
 
     @property
     def xy0(self):
-        p = self._Exposure.getXY0()
+        p = self._swig_object.getXY0()
         return geom.Point2I(_external=p)
 
     @property
     def y0(self):
-        return self._Exposure.getY0()
+        return self._swig_object.getY0()
 
     @calib.setter
     def calib(self, calib):
-        self._Exposure.setCalib(calib)
+        self._swig_object.setCalib(calib)
 
     @detector.setter
     def detector(self, detector):
-        self._Exposure.setDetector(detector)
+        self._swig_object.setDetector(detector)
 
     @filter.setter
     def filter(self, filter):
-        self._Exposure.setCalib(filter)
+        self._swig_object.setCalib(filter)
 
     @masked_image.setter
     def masked_image(self, maskedImage):
-        self._Exposure.setMaskedImage(maskedImage)
+        self._swig_object.setMaskedImage(maskedImage)
 
     @metadata.setter
     def metadata(self, metadata):
-        self._Exposure.setMetadata(metadata)
+        self._swig_object.setMetadata(metadata)
 
     @psf.setter
     def psf(self, psf):
-        self._Exposure.setPsf(psf)
+        self._swig_object.setPsf(psf)
 
     @wcs.setter
     def wcs(self, wcs):
-        self._Exposure.setWcs(wcs)
+        self._swig_object.setWcs(wcs)
 
     @xy0.setter
     def xy0(self, origin):
-        self._Exposure.setXY0(origin._swig_object)
+        self._swig_object.setXY0(origin._swig_object)
 
     def get_bbox_with_origin(self, origin):
-        bb = self._Exposure.getBBox(origin._swig_object)
+        bb = self._swig_object.getBBox(origin._swig_object)
         return geom.Box2I(_external=bb)
 
     def has_psf(self):
-        return self._Exposure.hasPsf()
+        return self._swig_object.hasPsf()
 
     def has_wcs(self):
-        return self._Exposure.hasWcs()
+        return self._swig_object.hasWcs()
 
     def write_fits(self, *args):
-        self._Exposure.writeFits(*args)
+        self._swig_object.writeFits(*args)
 
     def __deepcopy__(self, memo):
         # Construct an empty object that we can fill explicitly
         copy = type(self)(empty=True)
-        copy._Exposure = self._Exposure.clone()
+        copy._swig_object = self._swig_object.clone()
         return copy
 
     @classmethod
     def read_fits(cls, *args, **kwargs):
         dtype = cls._determine_dtype(kwargs)
         new = cls(empty=True)
-        new._Exposure = cls._create_ExposureX(dtype, *args)
+        new._swig_object = cls._create_ExposureX(dtype, *args)
         return new
