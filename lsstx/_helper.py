@@ -24,6 +24,7 @@ from __future__ import absolute_import, division, print_function
 """
 Helper routines for lsstx
 """
+import numpy as np
 
 
 def swigify(args):
@@ -37,3 +38,31 @@ def swigify(args):
         else:
             newargs.append(a)
     return newargs
+
+
+def determine_dtype(options):
+    """
+    Look for a "dtype" key in the supplied dict. If found, return the value
+    of that key and delete it from the dict. Returns a default value of
+    np.float32.
+    """
+    if "dtype" in options:
+        dtype = options["dtype"]
+        del options["dtype"]
+    else:
+        dtype = np.float32
+    return dtype
+
+
+def new_swig_object(dtype, lut, *args, **kwargs):
+    """
+    Instantiate an object of type determined by the look up table
+    dict. "dtype" must be a member of "lut". The args and kwargs are
+    forwarded to the constructor.
+    """
+    # Object translation
+    args = swigify(args)
+
+    if dtype in lut:
+        return lut[dtype](*args, **kwargs)
+    raise ValueError("Unsupported data type for exposure")

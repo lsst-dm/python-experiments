@@ -23,7 +23,7 @@ from __future__ import absolute_import, division, print_function
 
 
 """
-Experimental reimplementation of afwImage.ExposureX.
+Experimental reimplementation of afwImage.
 
 Work in progress. Documentation is not meant to be complete.
 
@@ -84,32 +84,17 @@ class Exposure (object):
 
         # Need to extract dtype from keyword args and then forward on to low-level
         # constructor
-        dtype = self._determine_dtype(kwargs)
+        dtype = h.determine_dtype(kwargs)
         self._swig_object = self._create_ExposureX(dtype, *args, **kwargs)
 
     @classmethod
     def _create_ExposureX(cls, dtype, *args, **kwargs):
-
-        # Object translation
-        args = h.swigify(args)
-
         lut = dict({
             np.float32: afwImage.ExposureF,
             np.float64: afwImage.ExposureD,
             np.int32: afwImage.ExposureI,
             })
-        if dtype in lut:
-            return lut[dtype](*args, **kwargs)
-        raise ValueError("Unsupported data type for exposure")
-
-    @classmethod
-    def _determine_dtype(cls, options):
-        if "dtype" in options:
-            dtype = options["dtype"]
-            del options["dtype"]
-        else:
-            dtype = np.float32
-        return dtype
+        return h.new_swig_object(dtype, lut, *args, **kwargs)
 
     @property
     def bbox(self):
@@ -140,7 +125,7 @@ class Exposure (object):
 
     @property
     def masked_image(self):
-        return self._swig_object.getMaskedImage()
+        return MaskedImage(_external=self._swig_object.getMaskedImage())
 
     @property
     def metadata(self):
@@ -185,7 +170,7 @@ class Exposure (object):
 
     @masked_image.setter
     def masked_image(self, maskedImage):
-        self._swig_object.setMaskedImage(maskedImage)
+        self._swig_object.setMaskedImage(maskedImage._swig_object)
 
     @metadata.setter
     def metadata(self, metadata):
@@ -224,7 +209,39 @@ class Exposure (object):
 
     @classmethod
     def read_fits(cls, *args, **kwargs):
-        dtype = cls._determine_dtype(kwargs)
+        dtype = h.determine_dtype(kwargs)
         new = cls(empty=True)
         new._swig_object = cls._create_ExposureX(dtype, *args)
         return new
+
+
+class MaskedImage(object):
+
+    def __init__(self, *args, **kwargs):
+        if "_external" in kwargs and kwargs["_external"] is not None:
+            self._swig_object = kwargs["_external"]
+            return
+        dtype = h.determine_dtype(kwargs)
+        self._swig_object = self._create_MaskedImageX(dtype, *args, **kwargs)
+
+    @classmethod
+    def _create_MaskedImageX(cls, dtype, *args, **kwargs):
+        lut = dict({
+            np.float32: afwImage.MaskedImageF,
+            np.float64: afwImage.MaskedImageD,
+            np.int32: afwImage.MaskedImageI,
+            np.uint32: afwImage.MaskedImageU,
+            })
+        return h.new_swig_object(dtype, lut, *args, **kwargs)
+
+
+def make_exposure(*args):
+    """
+    Create an Exposure object from the supplied arguments.
+
+    exposure = make_exposure(mi)
+    """
+    # Convert the argument list to swig arguments as required
+    newargs = h.swigify(args)
+    _swig_object = afwImage.makeExposure(*newargs)
+    return Exposure(_external=_swig_object)
