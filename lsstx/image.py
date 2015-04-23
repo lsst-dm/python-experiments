@@ -78,6 +78,10 @@ class Exposure (object):
         if "empty" in kwargs and kwargs["empty"]:
             return
 
+        if "_external" in kwargs and kwargs["_external"] is not None:
+            self._swig_object = kwargs["_external"]
+            return
+
         # Need to extract dtype from keyword args and then forward on to low-level
         # constructor
         dtype = self._determine_dtype(kwargs)
