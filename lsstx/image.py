@@ -31,6 +31,7 @@ Work in progress. Documentation is not meant to be complete.
 import numpy as np
 import lsst.afw.image as afwImage
 from . import geom
+from . import _helper as h
 
 
 class Exposure (object):
@@ -86,9 +87,7 @@ class Exposure (object):
     def _create_ExposureX(cls, dtype, *args, **kwargs):
 
         # Object translation
-        if isinstance(args[0], geom.ExtentBase):
-            args = list(args)
-            args[0] = args[0]._swig_object
+        args = h.swigify(args)
 
         lut = dict({
             np.float32: afwImage.ExposureF,

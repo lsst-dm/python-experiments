@@ -29,6 +29,7 @@ Work in progress. Documentation is not meant to be complete.
 
 """
 import lsst.afw.geom as afwGeom
+from . import _helper as h
 
 
 class CoordinateExpr(object):
@@ -374,12 +375,8 @@ class ExtentPointBase(object):
         if len(args) == 1 and isinstance(args[0], (list, tuple)):
             args = args[0]
         # Convert args to C++ objects
-        newargs = []
-        for a in args:
-            if hasattr(a, '_swig_object'):
-                newargs.append(a._swig_object)
-            else:
-                newargs.append(a)
+        newargs = h.swigify(args)
+
         # Call the C++ constructor
         self._swig_object = constructor(*newargs)
 
@@ -827,12 +824,8 @@ class BoxBase(object):
             return
 
         # print("In {}.__init__ with {}".format(type(self), constructor))
-        newargs = []
-        for a in args:
-            if hasattr(a, '_swig_object'):
-                newargs.append(a._swig_object)
-            else:
-                newargs.append(a)
+        newargs = h.swigify(args)
+
         # Call the C++ constructor
         self._swig_object = constructor(*newargs)
 
