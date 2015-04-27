@@ -61,7 +61,6 @@ class TestExposure(unittest.TestCase):
 
     def test_MaskedImage(self):
         exp = image.Exposure(32, 40, dtype=np.float32)
-        print(exp.masked_image)
         e = image.make_exposure(exp.masked_image)
 
         self.assertEqual(e.width, 32)
@@ -71,6 +70,18 @@ class TestExposure(unittest.TestCase):
         e.masked_image = mi
         self.assertEqual(e.width, 64)
         self.assertEqual(e.height, 128)
+
+        data, var, mask = mi[0,0]
+        self.assertEqual(data, 0)
+
+        mi[0,0] = (1, 2, 3)
+        data, var, mask = mi[0,0]
+        self.assertEqual(data, 1)
+        self.assertEqual(var, 2)
+        self.assertEqual(mask, 3)
+
+        extent = mi.dimensions
+        self.assertIsInstance(extent, geom.Extent2I)
 
 if __name__ == '__main__':
     unittest.main()

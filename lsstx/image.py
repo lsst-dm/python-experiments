@@ -234,6 +234,43 @@ class MaskedImage(object):
             })
         return h.new_swig_object(dtype, lut, *args, **kwargs)
 
+    def __getitem__(self, slice):
+        """
+        Support slicing of a MaskedImage. Returns the slice of each numpy array
+        as a tuple.
+        """
+        arrays = self._swig_object.getArrays()
+        return (a[slice] for a in arrays)
+
+    def __setitem__(self, slice, values):
+        """
+        Given a tuple of replacement values (data, variance, mask) assign them to
+        the sliced MaskedImage arrays.
+        """
+        arrays = self._swig_object.getArrays()
+        for a, v in zip(arrays, values):
+            a[slice] = v
+
+    @property
+    def arrays(self):
+        return self._swig_object.getArrays()
+
+    @property
+    def bbox(self):
+        # Note that getBBox() has a form that takes an ImageOrigin argument
+        # but that can not be a property. See get_bbox_with_origin()
+        bb = self._swig_object.getBBox()
+        return geom.Box2I(_external=bb)
+
+    @property
+    def dimensions(self):
+        e = self._swig_object.getDimensions()
+        return geom.Extent2I(_external=e)
+
+    def get_bbox_with_origin(self, origin):
+        bb = self._swig_object.getBBox(origin._swig_object)
+        return geom.Box2I(_external=bb)
+
 
 def make_exposure(*args):
     """
