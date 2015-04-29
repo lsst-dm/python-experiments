@@ -71,14 +71,14 @@ class TestExposure(unittest.TestCase):
         self.assertEqual(e.width, 64)
         self.assertEqual(e.height, 128)
 
-        data, var, mask = mi[0,0]
+        data, mask, var = mi[0,0]
         self.assertEqual(data, 0)
 
         mi[0,0] = (1, 2, 3)
-        data, var, mask = mi[0,0]
+        data, mask, var = mi[0,0]
         self.assertEqual(data, 1)
-        self.assertEqual(var, 2)
-        self.assertEqual(mask, 3)
+        self.assertEqual(mask, 2)
+        self.assertEqual(var, 3)
 
         extent = mi.dimensions
         self.assertIsInstance(extent, geom.Extent2I)
