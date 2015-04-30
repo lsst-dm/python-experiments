@@ -215,6 +215,23 @@ class Exposure (object):
         return new
 
 
+class Image(object):
+
+    def __init__(self, *args, **kwargs):
+        if "_external" in kwargs and kwargs["_external"] is not None:
+            self._swig_object = kwargs["_external"]
+            return
+        raise NotImplementedError("Can not yet init a new Image object")
+
+    def __getitem__(self, slice):
+        a = self._swig_object.getArray()
+        return a[slice]
+
+    def __setitem__(self, slice, item):
+        a = self._swig_object.getArray()
+        a[slice] = item
+
+
 class MaskedImage(object):
 
     def __init__(self, *args, **kwargs):
@@ -253,19 +270,22 @@ class MaskedImage(object):
 
     @property
     def arrays(self):
+        """
+        Numpy arrays for image, mask and variance, returned as tuple.
+        """
         return self._swig_object.getArrays()
 
     @property
     def image(self):
-        return self._swig_object.getImage(noThrow=True)
+        return Image(_external=self._swig_object.getImage(noThrow=True))
 
     @property
     def mask(self):
-        return self._swig_object.getMask(noThrow=True)
+        return Image(_external=self._swig_object.getMask(noThrow=True))
 
     @property
     def variance(self):
-        return self._swig_object.getVariance(noThrow=True)
+        return Image(_external=self._swig_object.getVariance(noThrow=True))
 
     @property
     def bbox(self):

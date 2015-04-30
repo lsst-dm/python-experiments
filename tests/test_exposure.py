@@ -74,6 +74,9 @@ class TestExposure(unittest.TestCase):
         data, mask, var = mi[0,0]
         self.assertEqual(data, 0)
 
+        arrays = mi.arrays
+        self.assertEqual(len(arrays), 3)
+
         mi[0,0] = (1, 2, 3)
         data, mask, var = mi[0,0]
         self.assertEqual(data, 1)
@@ -82,6 +85,11 @@ class TestExposure(unittest.TestCase):
 
         extent = mi.dimensions
         self.assertIsInstance(extent, geom.Extent2I)
+
+        var_as_image = mi.variance
+        var_as_image[1:3,1:3] = np.array([[2,4],[5,6]])
+        self.assertEqual(var_as_image[2,2], 6)
+
 
 if __name__ == '__main__':
     unittest.main()
