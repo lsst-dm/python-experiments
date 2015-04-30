@@ -256,6 +256,18 @@ class MaskedImage(object):
         return self._swig_object.getArrays()
 
     @property
+    def image(self):
+        return self._swig_object.getImage(noThrow=True)
+
+    @property
+    def mask(self):
+        return self._swig_object.getMask(noThrow=True)
+
+    @property
+    def variance(self):
+        return self._swig_object.getVariance(noThrow=True)
+
+    @property
     def bbox(self):
         # Note that getBBox() has a form that takes an ImageOrigin argument
         # but that can not be a property. See get_bbox_with_origin()
