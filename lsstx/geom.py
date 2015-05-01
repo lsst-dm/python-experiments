@@ -355,7 +355,6 @@ class Point(PointExtent):
 
 
 class ExtentPointBase(object):
-    _swig_object = None
     # These are all mutable objects
     __hash__ = None
 
@@ -813,7 +812,6 @@ class Extent3I(ExtentI):
 
 
 class BoxBase(object):
-    _swig_object = None
     # These are all mutable objects
     __hash__ = None
 
