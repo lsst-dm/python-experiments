@@ -292,7 +292,7 @@ class PointExtent(object):
         """
         # Bit of a hack
         name = type(swig_object).__name__
-        lut = dict({
+        lut = {
             "Extent2D": Extent2D,
             "Extent2I": Extent2I,
             "Point2D": Point2D,
@@ -301,7 +301,7 @@ class PointExtent(object):
             "Extent3I": Extent3I,
             "Point3D": Point3D,
             "Point3I": Point3I
-            })
+            }
         if name in lut:
             return lut[name](_external=swig_object)
         raise ValueError("Unrecognized object type {} from {}".format(type(swig_object), swig_object))
@@ -609,7 +609,7 @@ class Point2(Point):
         """
         Create an Point object with dimensionality 2.
         """
-        kwargs = dict({"_dims": 2})
+        kwargs = {"_dims": 2}
         # Not allowed to use python3 super()
         return super(Point2, cls).__new__(cls, *args, **kwargs)
 
@@ -620,7 +620,7 @@ class Point3(Point):
         """
         Create an Point object with dimensionality 3.
         """
-        kwargs = dict({"_dims": 3})
+        kwargs = {"_dims": 3}
         return super(Point3, cls).__new__(cls, *args, **kwargs)
 
 
@@ -750,7 +750,7 @@ class Extent2(Extent):
 class Extent3(Extent):
 
     def __new__(cls, *args):
-        kwargs = dict({"_dims": 3})
+        kwargs = {"_dims": 3}
         return super(Extent3, cls).__new__(cls, *args, **kwargs)
 
 

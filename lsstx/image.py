@@ -89,11 +89,11 @@ class Exposure (object):
 
     @classmethod
     def _create_ExposureX(cls, dtype, *args, **kwargs):
-        lut = dict({
+        lut = {
             np.float32: afwImage.ExposureF,
             np.float64: afwImage.ExposureD,
             np.int32: afwImage.ExposureI,
-            })
+            }
         return h.new_swig_object(dtype, lut, *args, **kwargs)
 
     @property
@@ -243,12 +243,12 @@ class MaskedImage(object):
 
     @classmethod
     def _create_MaskedImageX(cls, dtype, *args, **kwargs):
-        lut = dict({
+        lut = {
             np.float32: afwImage.MaskedImageF,
             np.float64: afwImage.MaskedImageD,
             np.int32: afwImage.MaskedImageI,
             np.uint32: afwImage.MaskedImageU,
-            })
+            }
         return h.new_swig_object(dtype, lut, *args, **kwargs)
 
     def __getitem__(self, slice):
