@@ -124,12 +124,7 @@ class CoordinateExpr(object):
 
         combo = cexp.all_true()
         """
-        values = self._as_tuple()
-        combo = values[0]
-        if len(values) > 1:
-            for b in values[1:]:
-                combo = combo and b
-        return combo
+        return reduce(lambda x, y: x and y, self._as_tuple())
 
     def __str__(self):
         """
