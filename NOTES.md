@@ -78,10 +78,19 @@ Some notes:
 
 For code examples and an initial implementation see <https://github.com/lsst-dm/python-experiments>.
 
-Reimplementing Exposure
+Reimplementing a C++ class in Python
 ---
 
-To be filled.
+The next stage is to rewrite an entire class in Python and make it unavailable from the C++ side. The mooted example was `Exposure` which is a convenient grouping of classes related to a particular exposure and includes a `MaskedImage` and `ExposureInfo` object. Reimplementing `Exposure` and `ExposureInfo` in pure Python is relatively straightforward. The complication is in transferring the relevant information to a C++ routine. The measurement infrastructure makes most use of `Exposure` but there is also warping. Warping requires access to the MaskedImage/Image and the WCS.
+
+> If WCS is needed inside a C++ routine, then WCS can not be implemented purely in python using, say, the Astropy gWCS implementation. The [AST library](http://www.starlink.ac.uk/ast) could be an alternative, a C object available in python, unless we wish to reimplement Astropy gWCS in C/C++, possibly including a C++ implementation of [ASDF](http://asdf-standard.readthedocs.org/en/latest/).
+
+The figure below gives an overview of the classes required for `Exposure` to function (this is not a class hierarchy, more of a "used by" diagram). These are all implemented currently in C++ in the AFW package. It is clear that it is entirely possibly for `Exposure` to be Python containing a C++ `MaskedImage` and C++ members of a Python `ExposureInfo`. In a worst case, a single argument would be replaced by eight.
+
+[![Exposure](exposure-dependencies.svg)]
+
+The worry is that we replace a Python/C++ interface that passes in a single object with a "Fortran" style call that passes in tens of explicit arguments using simple data types (strings, numeric scalars and numpy arrays). Is there a middle ground where a simple struct could be passed in rather than a full C++ object? Ideally we should audit the current interfaces to see how much information is required for each use of `Exposure` in C++.
+
 
 Cython/Numba
 ---
