@@ -1,5 +1,4 @@
- Python/C++ Interface investigations
- ===
+ ## Python/C++ Interface investigations
 
 Following a discussion with the Astropy team it was decided that we would consider whether the Python/C++ boundary in the LSST software stack is currently in the correct location. At present, the default situation is for much of the core LSST code to be written in C++ and then provide a SWIG interface for use from Python. This is done so that other C++ code can use the infrastructure libraries interchangeably without having to know that Python is involved at all. This approach leads to two obvious shortcomings when the code is given to someone expecting that the primary language is Python:
 
@@ -25,8 +24,7 @@ Following a discussion with the Astropy team it was decided that we would consid
 
 The current default is for library code to be written in C++ and then SWIGged in order to ensure that the code can be called from C++ and Python and, nominally, to ensure maximum performance. The work described in this document addresses whether we should adopt a "Python First" philosophy in the LSST data management software.
 
-Plan
----
+## Plan
 
 The investigation consisted of 3 phases:
 
@@ -34,8 +32,7 @@ The investigation consisted of 3 phases:
 2. Take a simple C++ object and reimplement it in Python with the aim of pushing the C++ boundary lower into the stack.
 3. Compare performance of cython/numba with native C++.
 
-Wrapping the SWIG
----
+### Wrapping the SWIG
 
 The easiest way to hide the C++ is to provide Python "shim" classes around all the SWIG-generated Python classes. For example converting:
 ```python
@@ -78,8 +75,7 @@ Some notes:
 
 For code examples and an initial implementation see <https://github.com/lsst-dm/python-experiments>.
 
-Reimplementing a C++ class in Python
----
+### Reimplementing a C++ class in Python
 
 The next stage is to rewrite an entire class in Python and make it unavailable from the C++ side. The mooted example was `Exposure` which is a convenient grouping of classes related to a particular exposure and includes a `MaskedImage` and `ExposureInfo` object. Reimplementing `Exposure` and `ExposureInfo` in pure Python is relatively straightforward. The complication is in transferring the relevant information to a C++ routine. The measurement infrastructure makes most use of `Exposure` but there is also warping. Warping requires access to the MaskedImage/Image and the WCS.
 
@@ -87,13 +83,12 @@ The next stage is to rewrite an entire class in Python and make it unavailable f
 
 The figure below gives an overview of the classes required for `Exposure` to function (this is not a class hierarchy, more of a "used by" diagram). These are all implemented currently in C++ in the AFW package. It is clear that it is entirely possibly for `Exposure` to be Python containing a C++ `MaskedImage` and C++ members of a Python `ExposureInfo`. In a worst case, a single argument would be replaced by eight.
 
-[![Exposure](exposure-dependencies.svg)]
+![Exposure](exposure-dependencies.svg)
 
 The worry is that we replace a Python/C++ interface that passes in a single object with a "Fortran" style call that passes in tens of explicit arguments using simple data types (strings, numeric scalars and numpy arrays). Is there a middle ground where a simple struct could be passed in rather than a full C++ object? Ideally we should audit the current interfaces to see how much information is required for each use of `Exposure` in C++.
 
 
-Cython/Numba
----
+### Cython/Numba
 
 Numba: <http://numba.pydata.org>
 
@@ -107,7 +102,6 @@ See for example:
 
 The main issue for LSST is whether the critical performance sections of the code base can be self-contained rather than being tightly integrated into the stack as a whole. One example is convolution of an Image by a PSF. Is there any expectation that a PSF could be defined in pure python code? How do we handle PSFs that vary across the image and so must therefore be calculated dynamically? Even if the PSF is a simple numpy array and the image is a numpy array, how much faster is the C++ implementation than a cython/numba implementation?
 
-Summary
----
+###Summary
 
 The fundamental question is whether the LSST software can be 95% python, with C/C++ limited to key performance areas? Does there have to be any WCS handling in C/C++ or can it be kept entirely in Python? Can the project become a Python project, built with setuptools, documented in Sphinx and distributed on pypi?
