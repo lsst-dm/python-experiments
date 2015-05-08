@@ -75,6 +75,8 @@ Some notes:
 
 For code examples and an initial implementation see <https://github.com/lsst-dm/python-experiments>.
 
+One problem with the simplistic wrapping approach is that it does not solve the problem of "surprisingly complicated" error messages bubbling up from the C++ layer.
+
 ### Reimplementing a C++ class in Python
 
 The next stage is to rewrite an entire class in Python and make it unavailable from the C++ side. The mooted example was `Exposure` which is a convenient grouping of classes related to a particular exposure and includes a `MaskedImage` and `ExposureInfo` object. Reimplementing `Exposure` and `ExposureInfo` in pure Python is relatively straightforward. The complication is in transferring the relevant information to a C++ routine. The measurement infrastructure makes most use of `Exposure` but there is also warping. Warping requires access to the MaskedImage/Image and the WCS.
@@ -101,6 +103,21 @@ See for example:
 * <http://eng.climate.com/2015/04/09/numba-vs-cython-how-to-choose/>
 
 The main issue for LSST is whether the critical performance sections of the code base can be self-contained rather than being tightly integrated into the stack as a whole. One example is convolution of an Image by a PSF. Is there any expectation that a PSF could be defined in pure python code? How do we handle PSFs that vary across the image and so must therefore be calculated dynamically? Even if the PSF is a simple numpy array and the image is a numpy array, how much faster is the C++ implementation than a cython/numba implementation?
+
+#### Comparison
+
+The AFW `convolve.py` test compares a python/numpy convolver with the AFW C++ convolver. The C++ implementation is approximately 3000 times faster than the python version. Given the python code the next step was to convert this to support numba and cython.
+
+The Cython implementation uses Python memory views rather than numpy directly. It is possible to convert the memoryview to a numpy object and call numpy methods but that involves a performance hit. All variables have to be typed for best performance and cython optimizes `for i in range(intvar)` syntax for looping. `numpy.<operator>.reduce(<array>.flat)` calls had to be replaced with explicit `for` loops. Once this was done the cython implementation was 150 times faster than Python/numpy, but 20 times slower than the C++. Cython can call native C/C++ code pretty easily if you need ultimate performance. One nice feature of cython is the annotation tool that will parse the cython file and create an html page to indicate where the problem points are located.
+
+
+__Note that numba in Anaconda 2.1.0 (version 0.14) is very very buggy. It was unable to optimize the Python convolver, complaining about the loops. Updating to v0.18 fixed all the weirdness and now numba performs slightly better than cython in most cases.__
+
+numba sounds great in that you write your python code, add an `@jit` decorator and revel in the joy of the speed increase. In reality this doesn't happen if you are actually doing something python-y in your python code. numba has similar problems to Cython in supporting numpy. Some APIs are supported and some are not (of note in this example is no support for `reduce()`). Additionally numba has a slow "object" mode and a fast native "nopython" mode for Jit compilation and you only get a real performance gain if you can write your code to use the supported subset. You can not allocate numpy arrays and expect to use the fast mode and for maximum performance the loops should be moved into their own routines (passing the output arrays in as arguments). Saying all this, the amazing thing is that if you follow the rules it really does work. Factoring the convolution core loops in to their own routine and not calling any numpy APIs, resulted in a speed up that sometimes got within a factor of almost 2 of the AFW C++ implementation. This is astonishing when it was achieved without any explicit data typing from the python programmer.
+
+Numba is approximately 2-5 times slower than C++ AFW; whilst Cython is approximately 3-5 times slower than numba in this example. It's entirely possible that some extra gains can be made by more careful reading of the documentation.
+
+
 
 ###Summary
 
