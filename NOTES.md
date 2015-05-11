@@ -117,7 +117,39 @@ numba sounds great in that you write your python code, add an `@jit` decorator a
 
 Numba is approximately 2-5 times slower than C++ AFW; whilst Cython is approximately 3-5 times slower than numba in this example. It's entirely possible that some extra gains can be made by more careful reading of the documentation.
 
-
+Here is the numba code for the tight loop:
+```python
+@jit(nopython=True)
+def runRefConvolveJitLoop(ignore_zero_pix, retRowRef, retColRef, numRows, numCols, kWidth, kHeight,
+                          kImArr, image, variance, mask, retImage, retVariance, retMask):
+    retRow = retRowRef
+    for inRowBeg in range(numRows):
+        inRowEnd = inRowBeg + kHeight
+        retCol = retColRef
+        for inColBeg in range(numCols):
+            inColEnd = inColBeg + kWidth
+            subImage = image[inColBeg:inColEnd, inRowBeg:inRowEnd]
+            subVariance = variance[inColBeg:inColEnd, inRowBeg:inRowEnd]
+            subMask = mask[inColBeg:inColEnd, inRowBeg:inRowEnd]
+            sum = 0.0
+            varsum = 0.0
+            outmask = 0
+            for i in range(kWidth):
+                for j in range(kHeight):
+                    sum += subImage[i, j] * kImArr[i, j]
+                    varsum += subVariance[i, j] * kImArr[i, j] * kImArr[i, j]
+                    if ignore_zero_pix:
+                        if kImArr[i, j] != 0:
+                            outmask |= subMask[i, j]
+                    else:
+                        outmask |= subMask[i,j]
+            retImage[retCol, retRow] = sum
+            retVariance[retCol, retRow] = varsum
+            retMask[retCol, retRow] = outmask
+            retCol += 1
+        retRow += 1
+    return
+```
 
 ###Summary
 
