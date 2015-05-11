@@ -155,4 +155,4 @@ The cython implementation looks similar except all the variables must be declare
 
 ###Summary
 
-The fundamental question is whether the LSST software can be 95% python, with C/C++ limited to key performance areas? Does there have to be any WCS handling in C/C++ or can it be kept entirely in Python? Can the project become a Python project, built with setuptools, documented in Sphinx and distributed on pypi?
+The fundamental question is whether the LSST DM stack can be 95% python, with C/C++ limited to key performance areas? Does there have to be any WCS handling in C/C++ or can it be kept entirely in Python? Can the stack become a Python project, built with setuptools, documented in Sphinx and distributed on pypi?
