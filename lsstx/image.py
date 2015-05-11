@@ -32,6 +32,7 @@ import numpy as np
 import lsst.afw.image as afwImage
 from . import geom
 from . import _helper as h
+from copy import deepcopy
 
 
 class Exposure (object):
@@ -302,6 +303,168 @@ class MaskedImage(object):
     def get_bbox_with_origin(self, origin):
         bb = self._swig_object.getBBox(origin._swig_object)
         return geom.Box2I(_external=bb)
+
+    def __deepcopy__(self, memo):
+        # Construct an empty object that we can fill explicitly
+        copy = type(self)(empty=True)
+        copy._swig_object = self._swig_object.clone()
+        return copy
+
+
+class ExposureInfo(object):
+    """
+    Information about an Exposure
+    """
+    def __init__(self, wcs=None, psf=None, calib=None, filter=None,
+                 detector=None, metadata=None, coadd_inputs=None,
+                 info=None, copy_metadata=False,):
+        """
+        C++ constructor takes:
+
+        Wcs, Psf, Calib, geom.Detector, Filter, daf.base.PropertySet, CoaddInputs
+        Wcs, Psf, Calib, geom.Detector, Filter, daf.base.PropertySet
+        Wcs, Psf, Calib, geom.Detector
+        Wcs, Psf, Calib
+        Wcs, Psf
+        Wcs
+        None
+        ExposureInfo, copyMetadata=bool
+
+        Indicating that we can branch on whether the first argument is a Wcs
+        or an ExposureInfo or not there at all, and otherwise count the number
+        of arguments. ExposureInfo does not seem to be used much in Python code.
+
+        In simple case, forward on to C++ constructor. We know how to do that
+        so instead try to implement natively. None of the arguments to the
+        constructor are wrapped yet, so all are still C++ SWIGged.
+
+        For the initializer we have the following options:
+
+        Option 1: Just count the arguments, check first for type.
+        Option 2: ExposureInfo( wcs=wcs, cal=calib, det=detector, filt=filter...)
+
+        Choose option 2 for this experiment as Option 1 is already in use.
+        """
+        self.wcs = None
+        self.psf = None
+        self.detector = None
+        self.calib = None
+        self.metadata = None
+        self.filter = None
+        self.coadd_inputs = None
+
+        if info is None:
+            self.wcs = wcs
+            self.psf = psf
+            self.detector = detector
+            self.calib = calib
+            self.metadata = metadata
+            self.filter = filter
+            self.coadd_inputs = coadd_inputs
+        else:
+            # Copy info. These are usually SWIGged objects
+            for attr, value in info.__dict__.items():
+                if value is not None:
+                    # Only clone if clone is implemented, else copy reference.
+                    # Some objects are immutable so no need to clone
+                    # in .cc file, Calib is deep copied using a copy constructor
+                    # but that interface is not exposed to Python.
+                    # lsst.daf.base.PropertySet has deepCopy() rather than clone()
+                    # and we may not always want to deep copy that.
+                    if hasattr(value, "clone"):
+                        value = value.clone()
+                    elif hasattr(value, "deepCopy"):
+                        # Deep copy unless this is metadata and we have been told not to
+                        if attr == "metadata" and not copy_metadata:
+                            pass
+                        else:
+                            value = value.deepCopy()
+                    self.__dict__[attr] = value
+
+    def has_calib(self):
+        """
+        Indicate whether a calib attribute has been set.
+        Should this be a property itself?
+        """
+        return self.calib is not None
+
+    def has_coadd_inputs(self):
+        """
+        Indicate whether a coadd_inputs attribute has been set.
+        """
+        return self.coadd_inputs is not None
+
+    def has_detector(self):
+        """
+        Indicate whether a detector attribute has been set.
+        """
+        return self.detector is not None
+
+    def has_psf(self):
+        """
+        Indicate whether a psf attribute has been set.
+        """
+        return self.psf is not None
+
+    def has_wcs(self):
+        """
+        Indicate whether a wcs attribute has been set.
+        """
+        return self.wcs is not None
+
+
+class ExposurePy(object):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialise an ExposurePy object. The question is whether
+        we use keyword arguments such as "mi=masked_image" or
+        whether we check the type of each argument in a list trying
+        to work out what the user wanted.
+
+        Current ExposureX constructor has:
+
+        2 integers, optional WCS
+        Extent object, optional WCS
+        No arguments
+        BBox object, optional WCS
+        MaskedImage, optional WCS
+        filename, optional BBox and origin
+        FITS file object, optional BBox and origin
+        Another Exposure object, optional BBox, origin and deepcopy flag.
+
+        So check first argument for integer, Extent, BBox, MaskedImage, string, etc
+
+        Python 3 allows "__init__(self, *args, wcs=None...)" but Python 2 does not.
+        This means that for Python2 we have to use **kwargs which has the disadvantage
+        of (1) not being self-documenting as to what the optional arguments are, and
+        (2) requiring more cruft in the code itself.
+
+        Optional arguments:
+
+        wcs
+        bbox
+        origin
+        conform_masks
+        deep
+
+        ei1 = ExposureInfo(32, 64, wcs=WCS)
+        ei2 = ExposureInfo(ei1, deep=True)
+        """
+        if len(args) == 0:
+            return
+
+        deep = False
+        if deep in kwargs:
+            deep = kwargs["deep"]
+
+        if isinstance(args[0], "ExposurePy"):
+            mi = args[0].masked_image
+            if deep:
+                mi = deepcopy(mi)
+            self.masked_image = mi
+        else:
+            self.masked_image = MaskedImage(*args)
 
 
 def make_exposure(*args):

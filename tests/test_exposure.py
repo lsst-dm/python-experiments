@@ -29,6 +29,8 @@ import lsstx.geom as geom
 import numpy as np
 import copy
 
+# Some tests use SWIGged objects
+import lsst.afw.image as afwImage
 
 class TestExposure(unittest.TestCase):
 
@@ -89,6 +91,14 @@ class TestExposure(unittest.TestCase):
         var_as_image = mi.variance
         var_as_image[1:3,1:3] = np.array([[2,4],[5,6]])
         self.assertEqual(var_as_image[2,2], 6)
+
+
+    def test_ExposureInfo(self):
+        cal = afwImage.Calib()
+        ei = image.ExposureInfo(calib=cal)
+        ei2 = image.ExposureInfo(info=ei)
+        self.assertTrue(ei2.has_calib())
+        self.assertFalse(ei2.has_wcs())
 
 
 if __name__ == '__main__':
