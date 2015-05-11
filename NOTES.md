@@ -20,6 +20,44 @@ Following a discussion with the Astropy team it was decided that we would consid
        getInfo(ExposureD self) -> boost::shared_ptr< lsst::afw::image::ExposureInfo const >
     ```
 
+    * When things go wrong the error messages are impenetrable. Even for something that is seemingly okay:
+    ```python
+    >>> import lsst.afw.image as afwImage
+    >>> afwImage.ExposureD((3,4))
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "/Users/timj/work/lsst-builds/v10_1/DarwinX86/afw/master-g8708957e45+1/python/lsst/afw/image/imageLib.py", line 10486, in __init__
+        this = _imageLib.new_ExposureD(*args)
+    NotImplementedError: Wrong number or type of arguments for overloaded function 'new_ExposureD'.
+      Possible C/C++ prototypes are:
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(unsigned int,unsigned int,boost::shared_ptr< lsst::afw::image::Wcs const >)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(unsigned int,unsigned int)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::geom::Extent2I const &,boost::shared_ptr< lsst::afw::image::Wcs const >)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::geom::Extent2I const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure()
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::geom::Box2I const &,boost::shared_ptr< lsst::afw::image::Wcs const >)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::geom::Box2I const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,unsigned short,float >::MaskedImageT &,boost::shared_ptr< lsst::afw::image::Wcs const >)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,unsigned short,float >::MaskedImageT &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(std::string const &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin,bool)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(std::string const &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(std::string const &,lsst::afw::geom::Box2I const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(std::string const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::MemFileManager &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin,bool)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::MemFileManager &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::MemFileManager &,lsst::afw::geom::Box2I const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::MemFileManager &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::Fits &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin,bool)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::Fits &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::Fits &,lsst::afw::geom::Box2I const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::fits::Fits &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel > const &,bool const)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel > const &)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel > const &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin const,bool const)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel > const &,lsst::afw::geom::Box2I const &,lsst::afw::image::ImageOrigin const)
+        lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel >::Exposure(lsst::afw::image::Exposure< double,lsst::afw::image::MaskPixel,lsst::afw::image::VariancePixel > const &,lsst::afw::geom::Box2I const &)
+    ```
+
 2. Classes that are commonly used by Python programmers in astronomy, such as Astropy coordinates and Pandas for table manipulation, are almost impossible to use in relation to LSST software as this functionality is implemented independently in C++.
 
 The current default is for library code to be written in C++ and then SWIGged in order to ensure that the code can be called from C++ and Python and, nominally, to ensure maximum performance. The work described in this document addresses whether we should adopt a "Python First" philosophy in the LSST data management software.
