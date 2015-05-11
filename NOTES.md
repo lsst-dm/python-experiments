@@ -151,6 +151,8 @@ def runRefConvolveJitLoop(ignore_zero_pix, retRowRef, retColRef, numRows, numCol
     return
 ```
 
+The cython implementation looks similar except all the variables must be declared to have a specific type explicitly. This will make it hard to deal with handling all the different data types without having a forwarding routine that checks the numpy types and forwards to the correct cython routine.
+
 ###Summary
 
 The fundamental question is whether the LSST software can be 95% python, with C/C++ limited to key performance areas? Does there have to be any WCS handling in C/C++ or can it be kept entirely in Python? Can the project become a Python project, built with setuptools, documented in Sphinx and distributed on pypi?
