@@ -31,14 +31,7 @@ def swigify(args):
     """
     Convert the argument list to swig arguments as required.
     """
-    newargs = []
-    for a in args:
-        if hasattr(a, '_swig_object'):
-            newargs.append(a._swig_object)
-        else:
-            newargs.append(a)
-    return newargs
-
+    return [a._swig_object if hasattr(a, "_swig_object") else a for a in args]
 
 def determine_dtype(options):
     """
