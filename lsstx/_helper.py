@@ -33,6 +33,7 @@ def swigify(args):
     """
     return [a._swig_object if hasattr(a, "_swig_object") else a for a in args]
 
+
 def determine_dtype(options):
     """
     Look for a "dtype" key in the supplied dict. If found, return the value
