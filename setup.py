@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lsstx",
-    version="0.0.1",
+    version="0.0.2",
     description="Experimental interfaces for LSST DM software stack",
     license="GPL",
     author="LSST DM Team",
@@ -31,9 +31,11 @@ setup(
     test_suite="tests",
 
     setup_requires=[
-        # python setupl.py flake8
+        # python setup.py flake8
         # to check the code
-        "flake8"
+        "flake8",
+        # For the astropy.time module
+        "astropy",
     ],
     extras_require={
         'dev': ['check-manifest'],
