@@ -144,7 +144,7 @@ class DateTimeTestCase(unittest.TestCase):
         self.assertEqual(ts.nsecs(), 1192755506000000000L)
         self.assertAlmostEqual(ts.get(DateTime.MJD, DateTime.UTC), 54392.040196759262)
 
-    def xtestFracSecs(self):
+    def testFracSecs(self):
         ts = DateTime("2004-03-01T12:39:45.1Z")
         self.assertEqual(ts.toString(), '2004-03-01T12:39:45.100000000Z')
         ts = DateTime("2004-03-01T12:39:45.01Z")
@@ -154,7 +154,7 @@ class DateTimeTestCase(unittest.TestCase):
         ts = DateTime("2004-03-01T12:39:45.0000000001Z") # too small
         self.assertEqual(ts.toString(), '2004-03-01T12:39:45.000000000Z')
 
-    def xtestNegative(self):
+    def testNegative(self):
         ts = DateTime("1969-03-01T00:00:32Z")
         self.assertEqual(ts.toString(), '1969-03-01T00:00:32.000000000Z')
         ts = DateTime("1969-01-01T00:00:00Z")
@@ -170,9 +170,9 @@ class DateTimeTestCase(unittest.TestCase):
 
         # Note slight inaccuracy in UTC-TAI-UTC round-trip
         ts = DateTime("1969-03-01T12:39:45.12345Z")
-        self.assertEqual(ts.toString(), '1969-03-01T12:39:45.123449996Z')
+        self.assertEqual(ts.toString(), '1969-03-01T12:39:45.123450000Z')
         ts = DateTime("1969-03-01T12:39:45.123456Z")
-        self.assertEqual(ts.toString(), '1969-03-01T12:39:45.123455996Z')
+        self.assertEqual(ts.toString(), '1969-03-01T12:39:45.123456000Z')
 
         ts = DateTime()
         self.assertEqual(ts.toString(), '1969-12-31T23:59:51.999918240Z')
@@ -191,7 +191,7 @@ class DateTimeTestCase(unittest.TestCase):
         ts = DateTime(1L, DateTime.UTC)
         self.assertEqual(ts.toString(), '1970-01-01T00:00:00.000000001Z')
 
-    def xtestConvert(self):
+    def testConvert(self):
         year = 2012
         month = 7
         day = 19
@@ -209,26 +209,26 @@ class DateTimeTestCase(unittest.TestCase):
         self.assertEqual(dt.minute, minute)
         self.assertEqual(dt.second, second)
 
-# class TimeZoneBaseTestCase(DateTimeTestCase):
-#     timezone = ""
-#     def setUp(self):
-#         self.tz = os.environ.setdefault('TZ', "")
-#         os.environ['TZ'] = self.timezone
+class TimeZoneBaseTestCase(DateTimeTestCase):
+    timezone = ""
+    def setUp(self):
+        self.tz = os.environ.setdefault('TZ', "")
+        os.environ['TZ'] = self.timezone
 
-#     def tearDown(self):
-#         if self.tz == "":
-#             del os.environ['TZ']
-#         else:
-#             os.environ['TZ'] = self.tz
+    def tearDown(self):
+        if self.tz == "":
+            del os.environ['TZ']
+        else:
+            os.environ['TZ'] = self.tz
 
-#class BritishTimeTestCase(TimeZoneBaseTestCase):
-#    timezone = "Europe/London"
+class BritishTimeTestCase(TimeZoneBaseTestCase):
+    timezone = "Europe/London"
 
-#class BritishTime2TestCase(TimeZoneBaseTestCase):
-#    timezone = "GMT0BST"
+class BritishTime2TestCase(TimeZoneBaseTestCase):
+    timezone = "GMT0BST"
 
-#class PacificTimeTestCase(TimeZoneBaseTestCase):
-#    timezone = "PST8PDT"
+class PacificTimeTestCase(TimeZoneBaseTestCase):
+    timezone = "PST8PDT"
 
 if __name__ == '__main__':
     unittest.main()
