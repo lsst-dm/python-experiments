@@ -214,9 +214,16 @@ class DateTime(object):
                 # "unix" does not work properly for leap days (the extra second is spread out over the day)
                 # so we have to work out the TAI delta and specify
                 # TAI epoch seconds
+
+                # TAI vs TT -- we adjust the constant offset here. Using a "ttunix" subclass
+                # doesn't quite work as it seems to introduce a rounding error of 15 nanosec
+                nsecs = args[0]
+                if kwargs["scale"] is Timescale.TT:
+                    nsecs -= 32184000000L
+
                 format = "taiunix"
                 scale = "utc"
-                time_arg = args[0] / 1e9
+                time_arg = nsecs / 1e9
                 print("Scale: ",kwargs["scale"])
                 if kwargs["scale"] is Timescale.UTC:
                     ttmp = Time(time_arg, format="unix", scale="utc")
