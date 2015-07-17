@@ -160,6 +160,8 @@ class DateTime(object):
         scale: Defaults to Timescale.TAI
 
         Can also take an Astropy Time object, which will be copied.
+
+        If no arguments are supplied the constructor will assume 0 nanoseconds.
         """
         print("Entering DateTime constructor with {} arguments".format(len(args)))
         print("Args", args)
@@ -167,6 +169,9 @@ class DateTime(object):
             if isinstance(args[0], Time):
                 self._internal = args[0].copy(format="mjd")
                 return
+        else:
+            # Assume 0 nanoseconds if no arguments at al
+            args = [0]
 
         # Support scale= and also explicit system+scale arguments
         if len(args) == 2 or len(args) == 7:
