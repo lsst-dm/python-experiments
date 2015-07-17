@@ -168,7 +168,6 @@ class DateTimeTestCase(unittest.TestCase):
         ts = DateTime("1969-03-01T12:39:45.000000001Z")
         self.assertEqual(ts.toString(), '1969-03-01T12:39:45.000000001Z')
 
-        # Note slight inaccuracy in UTC-TAI-UTC round-trip
         ts = DateTime("1969-03-01T12:39:45.12345Z")
         self.assertEqual(ts.toString(), '1969-03-01T12:39:45.123450000Z')
         ts = DateTime("1969-03-01T12:39:45.123456Z")
