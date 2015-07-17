@@ -192,7 +192,7 @@ class DateTime(object):
         format = "isot"
         scale = self._scale_to_astropy(kwargs["scale"])
         time_arg = None
-        print("Arg:", args[0])
+        print("Arg:", args[0], "Scale=",scale)
         if len(args) == 1:
             # in current compatibility scheme have to look for string vs float vs int types
             if isinstance(args[0], basestring):
@@ -247,10 +247,11 @@ class DateTime(object):
             format = "isot"
         else:
             raise ValueError("Unexpected number of arguments in DateTime constructor")
-        print("Time Arg:", time_arg)
+        print("Time Arg: {0!r}".format(time_arg))
         self._internal = Time(time_arg, format=format, scale=scale, precision=9)
         print("Internal: ",repr(self._internal.copy(format="isot").utc))
         print("Internal: ",repr(self._internal.copy(format="isot").tai))
+        print("Internal: ",repr(self._internal.copy(format="isot").tt))
         print("Internal: ",repr(self._internal.copy(format="mjd")))
         print("Internal: ",repr(self._internal.copy(format="unix")))
         print("Internal: ",repr(self._internal.copy(format="taiunix")))
