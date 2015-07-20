@@ -349,6 +349,10 @@ class DateTime(object):
             iso = iso + "Z"
         return iso
 
+    def __repr__(self):
+        # We report with TAI nanoseconds
+        return "{}({})".format(self.__class__.__name__, self.nsecs(Timescale.TAI))
+
     def toString(self):
         return str(self)
 
