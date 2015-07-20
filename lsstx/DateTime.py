@@ -337,6 +337,9 @@ class DateTime(object):
     def __eq__(self, rhs):
         return self._internal == rhs._internal
 
+    def __ne__(self, rhs):
+        return self._internal != rhs._internal
+
     def __str__(self):
         t = self._internal.copy(format="isot")
         t.precision = 9
