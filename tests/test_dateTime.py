@@ -78,8 +78,8 @@ class DateTimeTestCase(unittest.TestCase):
 
     def testCrossBoundaryNsecs(self):
         ts = DateTime(631151998000000000L, DateTime.UTC)
-        self.assertEqual(ts.nsecs(DateTime.TAI), 631152023000000000L)
         self.assertEqual(ts.nsecs(DateTime.UTC), 631151998000000000L)
+        self.assertEqual(ts.nsecs(DateTime.TAI), 631152023000000000L)
 
     def testNsecsTAI(self):
         ts = DateTime(1192755506000000000L, DateTime.TAI)
