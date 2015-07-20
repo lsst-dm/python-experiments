@@ -137,7 +137,7 @@ class DateTimeTestCase(unittest.TestCase):
         self.assertRaises(pexExcept.DomainError, lambda: DateTime("2009/04/01T23:36:05Z"))
         self.assertRaises(pexExcept.DomainError, lambda: DateTime("2009/04/01T23:36:05Z"))
 
-    def xtestNsecsTT(self):
+    def testNsecsTT(self):
         ts = DateTime(1192755538184000000L, DateTime.TT)
         self.assertEqual(ts.nsecs(DateTime.UTC), 1192755473000000000L)
         self.assertEqual(ts.nsecs(DateTime.TAI), 1192755506000000000L)
