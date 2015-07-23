@@ -341,7 +341,7 @@ class DateTime(object):
         return self._internal != rhs._internal
 
     def __str__(self):
-        t = self._internal.copy(format="isot")
+        t = self._internal.copy(format="isot").utc
         t.precision = 9
         iso = t.isot
         # daf_base seems to want the Z added if we have a UTC time
