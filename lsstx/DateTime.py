@@ -2,7 +2,7 @@ from __future__ import print_function, division, absolute_import
 import re
 from enum import Enum, unique
 
-from astropy.time import Time, TimeUnix, TimeFromEpoch
+from astropy.time import Time, TimeUnix, TimeFromEpoch, TimeDelta
 
 """
 Reimplementation of some of daf_base.DateTime using astropy.time
@@ -32,6 +32,16 @@ class TimeTAISinceUnix(TimeUnix):
     """
     name = 'taiunix'
     epoch_scale = 'tai'
+
+class TimeTTSinceUnix(TimeUnix):
+    """
+    Unix time: TT seconds from 1970-01-01 00:00:00 UTC.
+
+    Required because TimeUnix always uses 86400 seconds per day
+    so is not real UTC on leap days.
+    """
+    name = 'ttunix'
+    epoch_scale = 'tt'
 
 class TimeUTCSinceUnix(TimeUnix):
     """
@@ -192,6 +202,7 @@ class DateTime(object):
         format = "isot"
         scale = self._scale_to_astropy(kwargs["scale"])
         time_arg = None
+        fraction = None
         print("Arg:", args[0], "Scale=",scale)
         if len(args) == 1:
             # in current compatibility scheme have to look for string vs float vs int types
@@ -215,17 +226,17 @@ class DateTime(object):
                 # so we have to work out the TAI delta and specify
                 # TAI epoch seconds
 
-                # TAI vs TT -- we adjust the constant offset here. Using a "ttunix" subclass
-                # doesn't quite work as it seems to introduce a rounding error of 15 nanosec
-                nsecs = args[0]
-                if kwargs["scale"] is Timescale.TT:
-                    nsecs -= 32184000000L
+                # Fractions of seconds will be tracked separately as Astropy does not handle
+                # nanosecond integers natively.
 
-                format = "taiunix"
-                scale = "utc"
-                time_arg = nsecs / 1e9
-                print("Scale: ",kwargs["scale"])
-                if kwargs["scale"] is Timescale.UTC:
+                nsecs = args[0]
+                fraction = int(str(abs(nsecs))[-9:])
+                fracpositive = False if nsecs < 0 else True
+                time_arg = int(nsecs/1e9)
+                if kwargs["scale"] is Timescale.TAI:
+                    format = "taiunix"
+                elif kwargs["scale"] is Timescale.UTC:
+                    format = "taiunix"
                     ttmp = Time(time_arg, format="unix", scale="utc")
                     deltat = ttmp.taiunix - ttmp.unix
                     # Massive hack here: since "unix" seconds are not real seconds
@@ -234,7 +245,10 @@ class DateTime(object):
                     if time_arg > DateTime._EPOCH_INTEGER_LEAP:
                         deltat = int(deltat + 0.5)
                     time_arg += deltat
-                    print("NSEC __init__:",time_arg, deltat)
+                elif kwargs["scale"] is Timescale.TT:
+                    format = "ttunix"
+                else:
+                    raise ValueError("Unsupported timescale argument")
 
             elif isinstance(args[0], float):
                 format = self._system_to_astropy(kwargs["system"])
@@ -249,6 +263,24 @@ class DateTime(object):
             raise ValueError("Unexpected number of arguments in DateTime constructor")
         print("Time Arg: {0!r}".format(time_arg))
         self._internal = Time(time_arg, format=format, scale=scale, precision=9)
+
+        # Handle fractional nanoseconds. Experiment with two approaches. For
+        # positive fractions we reparse an ISO format date. For negative
+        # fractions we use a TimeDelta object.
+        if fraction is not None and fraction != 0:
+            t = self._internal
+            if fracpositive:
+                t.precision = 0
+                isostring = "{}.{:09d}".format(t.isot, fraction)
+                print("Adjusting fractional seconds as string: {}", isostring)
+                self._internal = Time(isostring, format="isot", scale=scale, precision=9)
+            else:
+                secs = float("0.{:09d}".format(fraction))
+                ts = scale if scale != "utc" else "tai"
+                td = TimeDelta(secs, format="sec", scale=ts)
+                print("Adjusting fractional seconds negative: {}", td)
+                self._internal -= td
+
         print("Internal: ",repr(self._internal.copy(format="isot").utc))
         print("Internal: ",repr(self._internal.copy(format="isot").tai))
         print("Internal: ",repr(self._internal.copy(format="isot").tt))
