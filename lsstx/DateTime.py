@@ -23,6 +23,7 @@ class DateSystem(Enum):
     MJD = 1
     EPOCH = 2  # Assumes Julian Epoch
 
+
 class TimeTAISinceUnix(TimeUnix):
     """
     Unix time: TAI seconds from 1970-01-01 00:00:00 UTC.
@@ -32,6 +33,7 @@ class TimeTAISinceUnix(TimeUnix):
     """
     name = 'taiunix'
     epoch_scale = 'tai'
+
 
 class TimeTTSinceUnix(TimeUnix):
     """
@@ -43,6 +45,7 @@ class TimeTTSinceUnix(TimeUnix):
     name = 'ttunix'
     epoch_scale = 'tt'
 
+
 class TimeUTCSinceUnix(TimeUnix):
     """
     Unix time: TAI seconds from 1970-01-01 00:00:00 UTC.
@@ -52,6 +55,7 @@ class TimeUTCSinceUnix(TimeUnix):
     """
     name = 'utcunix'
     epoch_scale = 'utc'
+
 
 class TimeLSSTNano(TimeFromEpoch):
     """
@@ -63,6 +67,7 @@ class TimeLSSTNano(TimeFromEpoch):
     epoch_val2 = None
     epoch_scale = "utc"
     epoch_format = "mjd"
+
 
 class DateTime(object):
     # The Python API requires the enums are class attributes of DateTime
@@ -91,7 +96,7 @@ class DateTime(object):
         """
         if isinstance(system, DateSystem):
             return system
-        sys_lut = { 0: DateSystem.JD, 1: DateSystem.MJD, 2: DateSystem.EPOCH }
+        sys_lut = {0: DateSystem.JD, 1: DateSystem.MJD, 2: DateSystem.EPOCH}
         if system in sys_lut:
             return sys_lut[system]
         raise ValueError("Supplied date systen value ({}) is not valid".format(system))
@@ -106,7 +111,7 @@ class DateTime(object):
         """
         if isinstance(scale, Timescale):
             return scale
-        scale_lut = { 0: Timescale.TAI, 1: Timescale.UTC, 2: Timescale.TT }
+        scale_lut = {0: Timescale.TAI, 1: Timescale.UTC, 2: Timescale.TT}
         if scale in scale_lut:
             return scale_lut[scale]
         raise ValueError("Supplied scale value ({}) is not valid".format(scale))
@@ -206,7 +211,7 @@ class DateTime(object):
         time_arg = None
         fraction = None
         if self.DEBUG:
-            print("Arg:", args[0], "Scale=",scale)
+            print("Arg:", args[0], "Scale=", scale)
         if len(args) == 1:
             # in current compatibility scheme have to look for string vs float vs int types
             if isinstance(args[0], basestring):
@@ -288,13 +293,13 @@ class DateTime(object):
                 self._internal -= td
 
         if self.DEBUG:
-            print("Internal: ",repr(self._internal.copy(format="isot").utc))
-            print("Internal: ",repr(self._internal.copy(format="isot").tai))
-            print("Internal: ",repr(self._internal.copy(format="isot").tt))
-            print("Internal: ",repr(self._internal.copy(format="mjd")))
-            print("Internal: ",repr(self._internal.copy(format="unix")))
-            print("Internal: ",repr(self._internal.copy(format="taiunix")))
-            print("Internal: ",repr(self._internal.copy(format="utcunix")))
+            print("Internal: ", repr(self._internal.copy(format="isot").utc))
+            print("Internal: ", repr(self._internal.copy(format="isot").tai))
+            print("Internal: ", repr(self._internal.copy(format="isot").tt))
+            print("Internal: ", repr(self._internal.copy(format="mjd")))
+            print("Internal: ", repr(self._internal.copy(format="unix")))
+            print("Internal: ", repr(self._internal.copy(format="taiunix")))
+            print("Internal: ", repr(self._internal.copy(format="utcunix")))
         return
 
     def nsecs(self, *args):
@@ -405,4 +410,3 @@ class DateTime(object):
         import datetime
         nsecs = self.nsecs(timescale) if timescale is not None else self.nsecs()
         return datetime.datetime.utcfromtimestamp(nsecs/10**9)
-
