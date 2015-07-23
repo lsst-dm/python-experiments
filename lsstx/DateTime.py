@@ -45,7 +45,7 @@ class TimeUTCSinceUnix(TimeUnix):
 
 class TimeLSSTNano(TimeFromEpoch):
     """
-    Nanoseconds since unix epoch.
+    Nanoseconds since unix epoch. Low precision.
     """
     name = "lsstnsec"
     unit = 1.0e-9 / 86400.
