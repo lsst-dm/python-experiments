@@ -73,6 +73,7 @@ class DateTime(object):
     UTC = Timescale.UTC
     TT = Timescale.TT
     _EPOCH_INTEGER_LEAP = 63072000
+    DEBUG = False
 
     @classmethod
     def now(self):
@@ -173,8 +174,9 @@ class DateTime(object):
 
         If no arguments are supplied the constructor will assume 0 nanoseconds.
         """
-        print("Entering DateTime constructor with {} arguments".format(len(args)))
-        print("Args", args)
+        if self.DEBUG:
+            print("Entering DateTime constructor with {} arguments".format(len(args)))
+            print("Args", args)
         if len(args):
             if isinstance(args[0], Time):
                 self._internal = args[0].copy(format="mjd")
@@ -203,7 +205,8 @@ class DateTime(object):
         scale = self._scale_to_astropy(kwargs["scale"])
         time_arg = None
         fraction = None
-        print("Arg:", args[0], "Scale=",scale)
+        if self.DEBUG:
+            print("Arg:", args[0], "Scale=",scale)
         if len(args) == 1:
             # in current compatibility scheme have to look for string vs float vs int types
             if isinstance(args[0], basestring):
@@ -261,7 +264,8 @@ class DateTime(object):
             format = "isot"
         else:
             raise ValueError("Unexpected number of arguments in DateTime constructor")
-        print("Time Arg: {0!r}".format(time_arg))
+        if self.DEBUG:
+            print("Time Arg: {0!r}".format(time_arg))
         self._internal = Time(time_arg, format=format, scale=scale, precision=9)
 
         # Handle fractional nanoseconds. Experiment with two approaches. For
@@ -272,22 +276,25 @@ class DateTime(object):
             if fracpositive:
                 t.precision = 0
                 isostring = "{}.{:09d}".format(t.isot, fraction)
-                print("Adjusting fractional seconds as string: {}", isostring)
+                if self.DEBUG:
+                    print("Adjusting fractional seconds as string: {}", isostring)
                 self._internal = Time(isostring, format="isot", scale=scale, precision=9)
             else:
                 secs = float("0.{:09d}".format(fraction))
                 ts = scale if scale != "utc" else "tai"
                 td = TimeDelta(secs, format="sec", scale=ts)
-                print("Adjusting fractional seconds negative: {}", td)
+                if self.DEBUG:
+                    print("Adjusting fractional seconds negative: {}", td)
                 self._internal -= td
 
-        print("Internal: ",repr(self._internal.copy(format="isot").utc))
-        print("Internal: ",repr(self._internal.copy(format="isot").tai))
-        print("Internal: ",repr(self._internal.copy(format="isot").tt))
-        print("Internal: ",repr(self._internal.copy(format="mjd")))
-        print("Internal: ",repr(self._internal.copy(format="unix")))
-        print("Internal: ",repr(self._internal.copy(format="taiunix")))
-        print("Internal: ",repr(self._internal.copy(format="utcunix")))
+        if self.DEBUG:
+            print("Internal: ",repr(self._internal.copy(format="isot").utc))
+            print("Internal: ",repr(self._internal.copy(format="isot").tai))
+            print("Internal: ",repr(self._internal.copy(format="isot").tt))
+            print("Internal: ",repr(self._internal.copy(format="mjd")))
+            print("Internal: ",repr(self._internal.copy(format="unix")))
+            print("Internal: ",repr(self._internal.copy(format="taiunix")))
+            print("Internal: ",repr(self._internal.copy(format="utcunix")))
         return
 
     def nsecs(self, *args):
@@ -300,7 +307,8 @@ class DateTime(object):
 
         TT not yet supported
         """
-        print("Entering nsecs() method:", args)
+        if self.DEBUG:
+            print("Entering nsecs() method:", args)
         if len(args) and args[0] is Timescale.TT:
             raise ValueError("nsecs() does not yet support TT timescale")
 
@@ -330,7 +338,8 @@ class DateTime(object):
             iso = t.tai.isot
         else:
             iso = t.utc.isot
-        print("NSECS String:", iso, " >> ", integer, ".", iso[20:29])
+        if self.DEBUG:
+            print("NSECS String:", iso, " >> ", integer, ".", iso[20:29])
         return long(str(integer) + iso[20:29] + "L")
 
     def get(self, *args):
