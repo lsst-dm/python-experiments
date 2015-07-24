@@ -302,6 +302,14 @@ class DateTime(object):
             print("Internal: ", repr(self._internal.copy(format="utcunix")))
         return
 
+    def copy(self):
+        """
+        Return an independent copy of the DateTime object.
+        """
+        # Technically DateTime is immutable so a copy could be the same
+        # object.
+        return self.__class__(self._internal)
+
     def nsecs(self, *args):
         """
         Return the nanosecs in epoch.
