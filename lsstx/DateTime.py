@@ -389,7 +389,9 @@ class DateTime(object):
         return t.mjd
 
     def __eq__(self, rhs):
-        return self._internal == rhs._internal
+        if not hasattr(rhs, "nsecs"):
+            return False
+        return self.nsecs() == rhs.nsecs()
 
     def __ne__(self, rhs):
         return self._internal != rhs._internal
