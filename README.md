@@ -5,6 +5,7 @@ This repository is used as a test bed for experimenting with the Python API used
 
 ```
 % python setup.py build
+% python setup.py install
 % python setup.py test
 % python setup.py flake8
 ```
