@@ -36,5 +36,7 @@ setup(
         "flake8",
         # For the astropy.time module
         "astropy",
+        # For the enum module in Python 2
+        "enum34",
     ],
 )
