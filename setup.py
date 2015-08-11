@@ -37,7 +37,4 @@ setup(
         # For the astropy.time module
         "astropy",
     ],
-    extras_require={
-        'dev': ['check-manifest'],
-    },
 )
